@@ -1,5 +1,5 @@
 APP       := vcms
-TARGET    := config-server
+TARGET    := config-writer
 MFLAGS    :=
 DFLAGS    :=
 CONFIG    := client

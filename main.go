@@ -2,11 +2,10 @@ package main
 
 import (
 	"fmt"
+	"github.com/tars-vcms/vcms-protocol/config/config-writer"
 	"os"
 
 	"github.com/TarsCloud/TarsGo/tars"
-
-	"config-server/tars-protocol/vcms"
 )
 
 func main() {
@@ -14,14 +13,17 @@ func main() {
 	cfg := tars.GetServerConfig()
 
 	// New servant imp
-	imp := new(configImp)
+	imp := new(ConfigWriterImp)
 	err := imp.Init()
 	if err != nil {
 		fmt.Printf("configImp init fail, err:(%s)\n", err)
 		os.Exit(-1)
 	}
+
+	//tars.RegisterServerFilter(ErrorFilter)
+
 	// New servant
-	app := new(vcms.Config)
+	app := new(config_writer.ConfigWriter)
 	// Register Servant
 	app.AddServantWithContext(imp, cfg.App+"."+cfg.Server+".configObj")
 

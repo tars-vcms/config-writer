@@ -1,3 +1,3 @@
 #!/bin/bash
 make
-./config-server --config=config.conf
+./config-writer --config=./config.conf

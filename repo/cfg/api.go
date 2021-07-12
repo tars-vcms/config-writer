@@ -1,18 +1,58 @@
 package cfg
 
 import (
-	"config-server/entity/config"
 	"context"
+	"github.com/tars-vcms/config-writer/entity/config"
+	"gorm.io/gorm"
 )
 
-type Config interface {
-	GetByID(id uint) (*config.Config, error)
+const (
+	// OptionAll 生成随机字符串代表搜索所有
+	OptionAll = "IDLyocviS9nPh6bW"
+)
 
-	GetBySecret(secret string) (*config.Config, error)
+const (
+	EnvColumn  = "Envs"
+	ItemColumn = "Items"
+)
 
-	InputConfig(ctx context.Context, cfg *config.Config) error
+type configOption struct {
+	Column string
+	Value  interface{}
 }
 
-func New() Config {
-	return newConfigImpl()
+type ConfigOption interface {
+	apply() func(db *gorm.DB) *gorm.DB
+}
+
+type Config interface {
+	GetByIDs(ids []uint64, opts ...ConfigOption) (*[]config.Config, error)
+
+	GetByNames(names []string, opts ...ConfigOption) (*[]config.Config, error)
+
+	InputConfig(ctx context.Context, cfg *config.Config) error
+
+	SaveConfig(ctx context.Context, cfg *config.Config) error
+}
+
+func New(db *gorm.DB) Config {
+	return newConfigImpl(db)
+}
+
+func newConfigOption(f func(*configOption)) ConfigOption {
+	return newConfigOptionImpl(f)
+}
+
+func WithEnv(name string) ConfigOption {
+	return newConfigOption(func(o *configOption) {
+		o.Column = EnvColumn
+		o.Value = name
+	})
+}
+
+func WithItem(name string) ConfigOption {
+	return newConfigOption(func(o *configOption) {
+		o.Column = ItemColumn
+		o.Value = name
+	})
 }
